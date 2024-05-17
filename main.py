@@ -13,7 +13,7 @@ def RNMu(signal, M):
     for i in range(M):
         for j in range(M):
             if j >= i:
-                R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[0 : N - j + i])
+                R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[1 : N - j + i])
                 
 
     for i in range(M):
