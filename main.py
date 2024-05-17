@@ -39,22 +39,25 @@ def assessmentImpulseResponse(yk, uk, M):
 # function to calculate the Fourier transform
 def fourierTransform(input_signal, show_periodogram=False):
     # Calculation of the Fourier transform
-    u1_fft = np.fft.fft(
-        input_signal
-    )  # U = sum(1...N){x(n)*exp(-j*2*pi*n*k/N)}, use w=2pi*k/n
+    u1_fft = np.fft.fft(input_signal)  # U = sum(1...N){x(n)*exp(-j*2*pi*n*k/N)}, use w=2pi*k/n
 
     if show_periodogram:
         # Calculating the periodogram
         periodogram = np.abs(u1_fft) ** 2
 
         # Frequencies corresponding to the values of the periodogram
-        freqs = np.fft.fftfreq(input_signal.size)  # N=100
+        N = input_signal.size
+        freqs = np.fft.fftfreq(N) * 2 * np.pi  # Scale frequencies to [-pi, pi]
+
+        # Adjust the periodogram and frequencies for visualization
+        periodogram = np.fft.fftshift(periodogram)
+        freqs = np.fft.fftshift(freqs)
 
         # Plotting the periodogram
         plt.figure(figsize=(10, 6))
         plt.plot(freqs, periodogram)
         plt.title("Periodogram of the Signal")
-        plt.xlabel("Frequency")
+        plt.xlabel("Frequency (radians per sample)")
         plt.ylabel("Power")
         plt.grid(True)
         plt.show()
