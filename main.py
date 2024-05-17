@@ -11,32 +11,29 @@ def RNMu(signal, M):
     R = np.zeros((M, M))
 
     for i in range(M):
-        for j in range(M):
-            if j >= i:
-                R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[1 : N - j + i])
-                
-
-    for i in range(M):
-        for j in range(M):
-            if i > j:
-                R[i, j] = R[j, i]
+        for j in range(i, M):
+            R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[: N - (j - i)])
+            if i != j:
+                R[j, i] = R[i, j]
 
     return R
 
+
+# Function to calculate the correlation vector for a given signal
 def RNMy(signal, M):
     N = len(signal)
     R = np.zeros(M)
     for i in range(M):
-        R[i] = 1 / N * np.sum(signal[i : N] * signal[0 : N - i])
+        R[i] = 1 / N * np.sum(signal[i:N] * signal[0 : N - i])
     return R
 
 
 # function to calculate the impulse response
 def assessmentImpulseResponse(yk, uk, M):
-    RNMu = RNMu(uk, M)
-    RNMy = RNMu(yk, M)
+    RNMuVar = RNMu(uk, M)
+    RNMyVar = RNMy(yk, M)
 
-    return np.matmul(np.linalg.inv(RNMu), RNMy)
+    return np.matmul(np.linalg.inv(RNMuVar), RNMyVar)
 
 
 # function to calculate the Fourier transform
@@ -51,7 +48,7 @@ def fourierTransform(input_signal, show_periodogram=False):
         periodogram = np.abs(u1_fft) ** 2
 
         # Frequencies corresponding to the values of the periodogram
-        freqs = np.fft.fftfreq(input_signal.size) # N=100
+        freqs = np.fft.fftfreq(input_signal.size)  # N=100
 
         # Plotting the periodogram
         plt.figure(figsize=(10, 6))
@@ -66,12 +63,11 @@ def fourierTransform(input_signal, show_periodogram=False):
 
 
 def main():
-    #uk = fourierTransform(u1, show_periodogram=True)
-    #yk = fourierTransform(y1, show_periodogram=True)
+    uk = fourierTransform(u1, show_periodogram=True)
+    yk = fourierTransform(y1, show_periodogram=True)
 
-    #print(assessmentImpulseResponse(yk, uk, M))
-    print(RNMu(u1, M))
-    # print(np.sum(u1[0 - 2 : N] * u1[0 : N - 0 + 2])
+    print(assessmentImpulseResponse(y1, u1, M))
+
 
 if __name__ == "__main__":
     sys.exit(main())
