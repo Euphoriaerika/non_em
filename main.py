@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from data import *
 
+############################# EVALUATION OF THE FREQUENCY RESPONSE #############################
 
 # Function to calculate the cosine and sine components of a given signal
 def cosineSineComponents(signal, w0):
@@ -13,6 +14,20 @@ def cosineSineComponents(signal, w0):
     Is = np.sum(signal * np.sin(w0 * t)) / N
     return Ic, Is
 
+# Function to calculate the magnitude and phase shift of the frequency response
+def frequencyResponse(signal, w0, show_cossin=False):
+    Ic, Is = cosineSineComponents(signal, w0)
+
+    if show_cossin:
+        print(f"Cosine of the Fourier transform of y0: Ic = {Ic}")
+        print(f"Sine of the Fourier transform of y0: Is = {Is}")
+
+    magnitude = 2 * np.sqrt(Ic**2 + Is**2)
+    phase_shift = -np.arctan2(Is, Ic)
+
+    return magnitude, phase_shift
+
+#################### ESTIMATES OF THE IMPULSE RESPONSE VECTOR OF THE SYSTEM ####################
 
 # Function to calculate the correlation matrix for a given signal
 def RNMu(signal, M):
@@ -36,6 +51,7 @@ def RNMy(signal, M):
         R[i] = 1 / N * np.sum(signal[i:N] * signal[0 : N - i])
     return R
 
+################################ FOURIER TRANSFORM OF A SIGNAL #################################
 
 # function to calculate the impulse response
 def assessmentImpulseResponse(yk, uk, M):
@@ -83,15 +99,11 @@ def main():
     # print(f"Fourier transform of a signal uk:\n{uk}")
     # print(f"Fourier transform of a signal yk:\n{yk}")
 
-    # assessment = assessmentImpulseResponse(y1, u1, M)
-    # print(f"Vector of the impulse response of the system:\n{assessment}")
+    assessment = assessmentImpulseResponse(y1, u1, M)
+    print(f"Vector of the impulse response of the system:\n{assessment}")
     
-    Ic, Is = cosineSineComponents(y0, w0)
-    print(f"Cosine of the Fourier transform of y0: Ic = {Ic}")
-    print(f"Sine of the Fourier transform of y0: Is = {Is}")
-
-
-
+    # Gneiw, argGneiw = frequencyResponse(y0, w0, show_cossin=True)
+    # print(f"Vector of the impulse response of the system:\nmagnitude = {Gneiw}\nphase shift = {argGneiw}")
 
 
 if __name__ == "__main__":
