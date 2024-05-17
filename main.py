@@ -2,7 +2,16 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-from test_data import *
+from data import *
+
+
+# Function to calculate the cosine and sine components of a given signal
+def cosineSineComponents(signal, w0):
+    N = len(signal)
+    t = np.arange(N)  # Time indices
+    Ic = np.sum(signal * np.cos(w0 * t)) / N
+    Is = np.sum(signal * np.sin(w0 * t)) / N
+    return Ic, Is
 
 
 # Function to calculate the correlation matrix for a given signal
@@ -13,7 +22,7 @@ def RNMu(signal, M):
     for i in range(M):
         for j in range(i, M):
             R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[: N - (j - i)])
-            if i != j:
+            if i != j: # R(tou) == R(-tuo)
                 R[j, i] = R[i, j]
 
     return R
@@ -39,15 +48,18 @@ def assessmentImpulseResponse(yk, uk, M):
 # function to calculate the Fourier transform
 def fourierTransform(input_signal, show_periodogram=False):
     # Calculation of the Fourier transform
-    u1_fft = np.fft.fft(input_signal)  # U = sum(1...N){x(n)*exp(-j*2*pi*n*k/N)}, use w=2pi*k/n
+    u1_fft =np.fft.fft(
+        input_signal
+    )  # U = sum(1...N){x(n)*exp(-j*2*pi*n*k/N)}, use w=2pi*k/n
 
     if show_periodogram:
         # Calculating the periodogram
         periodogram = np.abs(u1_fft) ** 2
 
         # Frequencies corresponding to the values of the periodogram
-        N = input_signal.size
-        freqs = np.fft.fftfreq(N) * 2 * np.pi  # Scale frequencies to [-pi, pi]
+        freqs = (
+            np.fft.fftfreq(input_signal.size) * 2 * np.pi
+        )  # Scale frequencies to [-pi, pi]
 
         # Adjust the periodogram and frequencies for visualization
         periodogram = np.fft.fftshift(periodogram)
@@ -66,10 +78,20 @@ def fourierTransform(input_signal, show_periodogram=False):
 
 
 def main():
-    uk = fourierTransform(u1, show_periodogram=True)
-    yk = fourierTransform(y1, show_periodogram=True)
+    # uk = fourierTransform(u1, show_periodogram=True)
+    # yk = fourierTransform(y1, show_periodogram=True)
+    # print(f"Fourier transform of a signal uk:\n{uk}")
+    # print(f"Fourier transform of a signal yk:\n{yk}")
 
-    print(assessmentImpulseResponse(y1, u1, M))
+    # assessment = assessmentImpulseResponse(y1, u1, M)
+    # print(f"Vector of the impulse response of the system:\n{assessment}")
+    
+    Ic, Is = cosineSineComponents(y0, w0)
+    print(f"Cosine of the Fourier transform of y0: Ic = {Ic}")
+    print(f"Sine of the Fourier transform of y0: Is = {Is}")
+
+
+
 
 
 if __name__ == "__main__":
