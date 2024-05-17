@@ -96,25 +96,40 @@ def fourierTransform(signal, show_periodogram=False):
 def checkParsevalEquality(input_signal, fourier_signal):
     return round(np.sum(input_signal**2), 3) == round(np.sum(np.abs(fourier_signal)**2), 3)
 
+# function to calculate the empirical evaluation of the transfer
+def empiricalEvaluationTransfer(output_signal, input_signal):
+    return np.divide(output_signal, input_signal)
+
+
 def main():
-    uk = fourierTransform(u1, show_periodogram=True)
-    # yk = fourierTransform(y1, show_periodogram=True)
+    uk = fourierTransform(u1, show_periodogram=False)
+    yk = fourierTransform(y1, show_periodogram=False)
     # print(f"Fourier transform of a signal uk:\n{uk}")
     # print(f"Fourier transform of a signal yk:\n{yk}")
 
     # assessment = assessmentImpulseResponse(y1, u1, M)
     # print(f"Vector of the impulse response of the system:\n{assessment}")
     
-    # Gneiw, argGneiw = frequencyResponse(y0, w0, show_cossin=True)
-    # print(f"Vector of the impulse response of the system:\nmagnitude = {Gneiw}\nphase shift = {argGneiw}")
+    # magnitude_yw0, phase_shift_yw0 = frequencyResponse(y0, w0, show_cossin=True)
+    # print(f"Vector of the impulse response of the system:\nmagnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}")
 
-    # upk = fourierTransform(up, show_periodogram=False)
-    # ypk = fourierTransform(yk, show_periodogram=True)
+    upk = fourierTransform(up, show_periodogram=False)
+    ypk = fourierTransform(yp, show_periodogram=False)
     # print(f"Fourier transform of a signal up:\n{upk}")
     # print(f"Fourier transform of a signal yk:\n{ypk}")
 
     # print("Parseval equality is satisfied" if checkParsevalEquality(up, upk) else "Parseval equality is not satisfied")
     
+    ## TODO: NEED FIX SECOND PART
+
+    # Estimation of the frequency response for empirical evaluation of the transfer function for up and yp
+    magnitude_yw1, phase_shift_yw1 = frequencyResponse(empiricalEvaluationTransfer(yp, up), w0)
+    print(f"Vector of the impulse response of the system:\nmagnitude = {magnitude_yw1}\nphase shift = {phase_shift_yw1}")
+
+    # Estimation of the frequency response for empirical evaluation of the transfer function for u1 and y1
+    magnitude_ywp, phase_shift_ywp = frequencyResponse(empiricalEvaluationTransfer(ypk, upk), w0)
+    print(f"Vector of the impulse response of the system:\nmagnitude = {magnitude_ywp}\nphase shift = {phase_shift_ywp}")
+
 
 
 if __name__ == "__main__":
