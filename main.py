@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-from data import *
+from test_data import *
 
 ############################# EVALUATION OF THE FREQUENCY RESPONSE #############################
 
@@ -54,18 +54,18 @@ def RNMy(signal, M):
 ################################ FOURIER TRANSFORM OF A SIGNAL #################################
 
 # function to calculate the impulse response
-def assessmentImpulseResponse(yk, uk, M):
-    RNMuVar = RNMu(uk, M)
-    RNMyVar = RNMy(yk, M)
+def assessmentImpulseResponse(output_signal, input_signal, M):
+    RNMuVar = RNMu(input_signal, M)
+    RNMyVar = RNMy(output_signal, M)
 
     return np.matmul(np.linalg.inv(RNMuVar), RNMyVar)
 
 
 # function to calculate the Fourier transform
-def fourierTransform(input_signal, show_periodogram=False):
+def fourierTransform(signal, show_periodogram=False):
     # Calculation of the Fourier transform
     u1_fft =np.fft.fft(
-        input_signal
+        signal, norm="ortho"
     )  # U = sum(1...N){x(n)*exp(-j*2*pi*n*k/N)}, use w=2pi*k/n
 
     if show_periodogram:
@@ -74,7 +74,7 @@ def fourierTransform(input_signal, show_periodogram=False):
 
         # Frequencies corresponding to the values of the periodogram
         freqs = (
-            np.fft.fftfreq(input_signal.size) * 2 * np.pi
+            np.fft.fftfreq(signal.size) * 2 * np.pi
         )  # Scale frequencies to [-pi, pi]
 
         # Adjust the periodogram and frequencies for visualization
@@ -92,18 +92,29 @@ def fourierTransform(input_signal, show_periodogram=False):
 
     return u1_fft
 
+# function to check if the parseval equality is satisfied
+def checkParsevalEquality(input_signal, fourier_signal):
+    return round(np.sum(input_signal**2), 3) == round(np.sum(np.abs(fourier_signal)**2), 3)
 
 def main():
-    # uk = fourierTransform(u1, show_periodogram=True)
+    uk = fourierTransform(u1, show_periodogram=True)
     # yk = fourierTransform(y1, show_periodogram=True)
     # print(f"Fourier transform of a signal uk:\n{uk}")
     # print(f"Fourier transform of a signal yk:\n{yk}")
 
-    assessment = assessmentImpulseResponse(y1, u1, M)
-    print(f"Vector of the impulse response of the system:\n{assessment}")
+    # assessment = assessmentImpulseResponse(y1, u1, M)
+    # print(f"Vector of the impulse response of the system:\n{assessment}")
     
     # Gneiw, argGneiw = frequencyResponse(y0, w0, show_cossin=True)
     # print(f"Vector of the impulse response of the system:\nmagnitude = {Gneiw}\nphase shift = {argGneiw}")
+
+    # upk = fourierTransform(up, show_periodogram=False)
+    # ypk = fourierTransform(yk, show_periodogram=True)
+    # print(f"Fourier transform of a signal up:\n{upk}")
+    # print(f"Fourier transform of a signal yk:\n{ypk}")
+
+    # print("Parseval equality is satisfied" if checkParsevalEquality(up, upk) else "Parseval equality is not satisfied")
+    
 
 
 if __name__ == "__main__":

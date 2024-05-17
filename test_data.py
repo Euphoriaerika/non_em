@@ -216,7 +216,7 @@ y1 = np.array(
     ]
 )
 
-up1 = np.array(
+up = np.array(
     [
         19/20,
         9/5,
@@ -321,7 +321,7 @@ up1 = np.array(
     ]
 )
 
-yp1 = np.array(
+yp = np.array(
     [
         0.4990888008599588,
         0.9142385005615639,
