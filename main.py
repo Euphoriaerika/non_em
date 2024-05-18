@@ -4,8 +4,16 @@ import sysidenttools.armodel_estimation as ar
 
 from sysidenttools.test_data import *
 
+
 def testARModelEstimation():
-    pass
+    # calculation of regression matrix elements (4)
+    r1 = nonem.calculateAutocorrelationMatrix(y, N)
+
+    # initial data a1 V1 (5)
+    a1 = -r1[1] / r1[0]
+    V1 = r1[0] - r1[1] ** 2 / r1[0]
+    print(a1, V1)
+
 
 def testNonEM():
     # uk = nonem.fourierTransform(u1, show_periodogram=False)
@@ -48,7 +56,6 @@ def testNonEM():
 def main():
     # testNonEM()
     testARModelEstimation()
-
 
 
 if __name__ == "__main__":
