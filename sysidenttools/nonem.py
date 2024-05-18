@@ -94,9 +94,9 @@ def frequencyResponse(signal, w0, show_cossin=False):
 # ===============================================
 
 
-def RNMu(signal, M):
+def calculateAutocorrelationMatrix(signal, M):
     """
-    Calculate the autocorrelation matrix of a given signal.
+    Calculate the regressions matrix of a given signal.
 
     Parameters
     ----------
@@ -135,7 +135,7 @@ def RNMu(signal, M):
     return R
 
 
-def RNMy(signal, M):
+def calculateAutocorrelationFunction(signal, M):
     """
     Calculate the autocorrelation function of a given signal for lags from 0 to M-1.
 
@@ -165,7 +165,7 @@ def RNMy(signal, M):
     R = np.zeros(M)
     for i in range(M):
         # Calculate the autocorrelation for lag i
-        R[i] = 1 / N * np.sum(signal[i:N] * signal[0 : N - i])
+        R[i] = 1 / N * np.sum(signal[i:N] * signal[: N - i])
     return R
 
 
@@ -199,8 +199,8 @@ def assessmentImpulseResponse(output_signal, input_signal, M):
     and the quality of the input and output signals.
     """
     # Calculate autocorrelation matrices
-    RNMuVar = RNMu(input_signal, M)
-    RNMyVar = RNMy(output_signal, M)
+    RNMuVar = calculateAutocorrelationMatrix(input_signal, M)
+    RNMyVar = calculateAutocorrelationFunction(output_signal, M)
 
     # Estimate impulse response vector
     impulse_response = np.matmul(np.linalg.inv(RNMuVar), RNMyVar)
