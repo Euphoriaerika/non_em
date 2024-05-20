@@ -53,9 +53,60 @@ def testNonEM():
     )
 
 
+def recursive_least_squares(y, n):
+    N = len(y)
+    # Матриця регресії
+    X = np.zeros((N-n, n))
+    for i in range(N-n):
+        X[i, :] = y[i:i+n]
+    
+    # Вектор вихідних значень
+    Y = y[n:]
+    
+    # Початкові значення
+    theta = np.zeros(n)
+    P = np.eye(n) * 1000  # Початкове значення коваріаційної матриці
+    
+    for t in range(N-n):
+        x_t = X[t, :].reshape(-1, 1)
+        y_t = Y[t]
+        
+        # Кроки 6-7: Рекурентна процедура для обчислення параметрів
+        K_t = P @ x_t / (1 + x_t.T @ P @ x_t)
+        theta = theta + (K_t * (y_t - x_t.T @ theta)).flatten()
+        P = P - K_t @ x_t.T @ P
+        
+    # Крок 8: Оцінюємо вихідні дані
+    y_hat = X @ theta
+    
+    # Крок 9: Оцінюємо шум системи
+    e = Y - y_hat
+    
+    # Крок 10: Обчислюємо математичне сподівання оцінки шуму
+    e_mean = np.mean(e)
+    
+    # Крок 11: Обчислюємо дисперсію оцінки шуму
+    e_var = np.var(e)
+    
+    return theta, y_hat, e, e_mean, e_var
+
+
 def main():
     # testNonEM()
-    testARModelEstimation()
+    # testARModelEstimation()
+
+    # test recursive_procedure()
+    # Приклад використання
+    best_n = 0
+    min_e_var = float('inf')
+
+    for n in range(3,9):
+        _, _, _, _, e_var = recursive_least_squares(y, n)
+        if e_var < min_e_var:
+            min_e_var = e_var
+            best_n = n
+
+    print(f'Найкраще значення n: {best_n} з мінімальною дисперсією шуму: {min_e_var}')
 
 
 if __name__ == "__main__":
