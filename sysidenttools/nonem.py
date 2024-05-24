@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .base import calculateAutocorrelationMatrix
 
 # ===============================================
 # EVALUATION OF THE FREQUENCY RESPONSE
@@ -32,7 +33,7 @@ def cosineSineComponents(signal, w0):
     phase of the signal's response at that frequency.
 
     The cosine component (Ic) represents the in-phase component, while the sine
-    component (Is) represents the quadrature component. 
+    component (Is) represents the quadrature component.
     """
     N = len(signal)
     t = np.arange(N)  # Time indices
@@ -92,47 +93,6 @@ def frequencyResponse(signal, w0, show_cossin=False):
 # ===============================================
 # ESTIMATES OF THE IMPULSE RESPONSE VECTOR OF THE SYSTEM
 # ===============================================
-
-
-def calculateAutocorrelationMatrix(signal, M):
-    """
-    Calculate the regressions matrix of a given signal.
-
-    Parameters
-    ----------
-    signal : array_like
-        The input signal whose autocorrelation matrix is to be calculated.
-    M : int
-        The size of the autocorrelation matrix.
-
-    Returns
-    ----------
-    R : ndarray
-        The M x M autocorrelation matrix of the input signal.
-
-    Notes
-    ------
-    The function calculates the autocorrelation matrix of the input signal,
-    which represents the correlation between different time-shifted versions
-    of the signal. The size of the autocorrelation matrix determines the maximum
-    time shift considered. Each element R[i, j] of the matrix represents the
-    correlation between the signal shifted by i samples and the signal shifted
-    by j samples.
-
-    The calculation assumes the signal length N is greater than or equal to M.
-
-    """
-    N = len(signal)
-    R = np.zeros((M, M))
-
-    for i in range(M):
-        for j in range(i, M):
-            # Calculate the autocorrelation element R[i, j]
-            R[i, j] = 1 / N * np.sum(signal[j - i : N] * signal[: N - (j - i)])
-            if i != j:  # Ensure the matrix is symmetric
-                R[j, i] = R[i, j]
-
-    return R
 
 
 def calculateAutocorrelationFunction(signal, M):
