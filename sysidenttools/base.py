@@ -39,13 +39,45 @@ def calculateAutocorrelationMatrix(array, M):
     for i in range(M):
         for j in range(i, M):
             # Calculate the autocorrelation element R[i, j]
-            R[i, j] = 1 / N * np.sum(array[j - i : N] * array[: N - (j - i)])
-            if i == 0 and j == 1:  print(array[j - i : N])
+            R[i, j] = (1 / N) * np.sum(array[j - i : N] * array[: N - (j - i)])
 
             # Ensure the matrix is symmetric
             if i != j:
                 R[j, i] = R[i, j]
 
+    return R
+
+def calculateAutocorrelationFunction(array, M):
+    """
+    Calculate the autocorrelation function of a given array for lags from 0 to M-1.
+
+    Parameters
+    ----------
+    array : array_like
+        The input array whose autocorrelation function is to be calculated.
+    M : int
+        The number of lags for which to calculate the autocorrelation.
+
+    Returns
+    ----------
+    R : ndarray
+        The autocorrelation function of the input array for lags from 0 to M-1.
+
+    Notes
+    ------
+    The function calculates the autocorrelation function for lags ranging from 0 to M-1.
+    The autocorrelation at lag i is computed as the average product of the array with
+    itself, shifted by i samples. This provides a measure of similarity between the array
+    and a delayed version of itself, which is useful for identifying repeating patterns or
+    periodicity within the array.
+
+    The calculation assumes the array length N is greater than or equal to M.
+    """
+    N = len(array)
+    R = np.zeros(M)
+    for i in range(M):
+        # Calculate the autocorrelation for lag i
+        R[i] = 1 / N * np.sum(array[i:N] * array[: N - i])
     return R
 
 

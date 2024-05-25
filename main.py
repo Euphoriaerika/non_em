@@ -1,4 +1,5 @@
 import sys
+
 import sysidenttools.nonem as nonem
 import sysidenttools.armodel_estimation as ar
 import sysidenttools.base as base
@@ -7,29 +8,65 @@ from sysidenttools.test_data import *
 
 
 def testARModelEstimation():
-    O = ar.estimateParametersVector(y, N, n)
-    # print(O)
+    n_count = 8
+    for n_iter in range(n, n_count):
+        # Estimate the parameters vector
+        O = ar.estimateParametersVector(y, N, n_iter)
+        # print(f"Estimated parameters vector: {O}")
+        # Evaluate the output data
+        yk = ar.evaluateOutputData(y, O, N, n_iter)
+        # print(f"Evaluation of the output data: {yk}")
 
-    yk = np.zeros(N)
-    yk[0] = y[0]
-    yT = np.zeros(N)
-    for i in range(1, N):
-        for j in range(N):
-            if i - j > 0:
-                yT[j] = y[i - j]
-            else:
-                yT[j] = 0
-        yk[i] = np.dot(yT, O)
+        # Estimate the noise
+        noise = ar.noiseEstimation(y, yk, N)
+        # print(f"Noise estimation: {noise}")
 
-    # print(yk)
+        # Calculate the math expectation
+        math_expectation = base.mathExpectation(noise)
+        # print(f"Math expectation :{math_expectation}")
 
-    noise = np.zeros(N)
-    for i in range(N):
-        noise[i] = y[i] - yk[i]
+        # Calculate the math dispersion
+        math_dispersion = base.mathDispersion(noise)
+        # print(f"Math dispersion {math_dispersion}")
 
-    # print(base.mathExpectation(noise))
-    # print(base.mathDispersion(noise))
-    # print(noise)
+        # Initialize the minimum dispersion and optimal model order
+        # The minimum dispersion and optimal model order are calculated
+        # by comparing the dispersion of the current model order with
+        # the minimum dispersion found so far
+        if n_iter == 3:
+            # Set the minimum dispersion to the current dispersion
+            min_dis = math_dispersion
+            min_n = n_iter
+            yk_res = yk
+            O_res = O
+
+        if math_dispersion < min_dis:
+            # Update the minimum dispersion to the current dispersion
+            # and update the optimal model order to the current model order
+            min_dis = math_dispersion
+            min_n = n_iter
+            yk_res = yk
+            O_res = O
+
+    # Print the optimal model order and minimum dispersion
+    print(f"Optimal model order: {min_n} with min dispersion: {min_dis}")
+    
+    # Write y_res to output_data/BRRudenko.txt
+    with open('output_data/BRRudenko.txt', 'w') as file:
+        file.write(f"\nN: {N}\n")
+        file.write(f"\nn: {min_n}\n")
+        file.write(f"\nTheta values:\n")
+        for value in O_res:
+            file.write(f"{value}\n")
+        file.write(f"\nyk values:\n")
+        for value in yk_res:
+            file.write(f"{value}\n")
+        file.write(f"\nnoise values:\n")
+        for value in noise:
+            file.write(f"{value}\n")
+        file.write(f"\nMath expectation: {math_expectation}\n")
+        file.write(f"\nMath dispersion: {math_dispersion}\n")
+
 
 
 def testNonEM():
@@ -70,6 +107,7 @@ def testNonEM():
     # print(
     #     f"Vector of the impulse response of the system:\nmagnitude = {magnitude_ywp}\nphase shift = {phase_shift_ywp}"
     # )
+
 
 
 def main():
