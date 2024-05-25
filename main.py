@@ -4,7 +4,7 @@ import sysidenttools.nonem as nonem
 import sysidenttools.armodel_estimation as ar
 import sysidenttools.base as base
 
-from sysidenttools.test_data import *
+from data import *
 
 
 def testARModelEstimation():
@@ -15,11 +15,11 @@ def testARModelEstimation():
         # print(f"Estimated parameters vector: {O}")
         # Evaluate the output data
         yk = ar.evaluateOutputData(y, O, N, n_iter)
-        # print(f"Evaluation of the output data: {yk}")
+        # print(f"Evaluation of the output data: \n{yk}")
 
         # Estimate the noise
         noise = ar.noiseEstimation(y, yk, N)
-        # print(f"Noise estimation: {noise}")
+        # print(f"Noise estimation: \n{noise}")
 
         # Calculate the math expectation
         math_expectation = base.mathExpectation(noise)
@@ -36,17 +36,21 @@ def testARModelEstimation():
         if n_iter == 3:
             # Set the minimum dispersion to the current dispersion
             min_dis = math_dispersion
+            min_me = math_expectation
             min_n = n_iter
             yk_res = yk
             O_res = O
+            noise_res = noise
 
         if math_dispersion < min_dis:
             # Update the minimum dispersion to the current dispersion
             # and update the optimal model order to the current model order
             min_dis = math_dispersion
+            min_me = math_expectation
             min_n = n_iter
             yk_res = yk
             O_res = O
+            noise_res = noise
 
     # Print the optimal model order and minimum dispersion
     print(f"Optimal model order: {min_n} with min dispersion: {min_dis}")
@@ -62,10 +66,10 @@ def testARModelEstimation():
         for value in yk_res:
             file.write(f"{value}\n")
         file.write(f"\nnoise values:\n")
-        for value in noise:
+        for value in noise_res:
             file.write(f"{value}\n")
-        file.write(f"\nMath expectation: {math_expectation}\n")
-        file.write(f"\nMath dispersion: {math_dispersion}\n")
+        file.write(f"\nMath expectation: {min_me}\n")
+        file.write(f"\nMath dispersion: {min_dis}\n")
 
 
 
