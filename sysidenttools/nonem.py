@@ -221,10 +221,10 @@ def searchZeroValue(fourier_signal):
 
 
 def empiricalEvaluationTransfer(
-    output_signal, input_signal, omega=None, magn_pfase_show=False
+    output_signal, input_signal, omega=None, magnitude_phase_show=False
 ):
     """
-    Perform empirical evaluation of the transfer function of a system.
+    Perform an empirical evaluation of the transfer function of a system.
 
     Parameters
     ----------
@@ -233,20 +233,29 @@ def empiricalEvaluationTransfer(
     input_signal : array_like
         The input signal to the system.
     omega : array_like, optional
-        The frequency values (radians per sample) corresponding to the transfer function (default is None).
-    show_plot : bool, optional
+        The frequency values (radians per sample) corresponding to the transfer function.
+        If None, the function will generate frequencies from 1 to the sample rate of the output signal.
+    magnitude_phase_show : bool, optional
         Whether to plot the magnitude and phase of the transfer function (default is False).
 
     Returns
     -------
-    ndarray
-        The empirical transfer function of the system.
+    tuple or ndarray
+        A tuple containing the empirical transfer function, its magnitude and phase if
+        magnitude_phase_show is True, otherwise returns only the empirical transfer function.
     """
+    if omega is None:
+        # Generate frequencies from 1 to the sample rate of the output signal
+        omega = [
+            (2 * np.pi * i) / output_signal.size
+            for i in range(1, output_signal.size + 1)
+        ]
+    print(omega)
     # Check if input signals have the same size
     if len(output_signal) != len(input_signal):
         raise ValueError("Output signal and input signal must have the same size.")
 
-    # Perform empirical evaluation of the transfer function
+    # Perform an empirical evaluation of the transfer function
     empirical_transfer_function = np.divide(
         output_signal,
         input_signal,
@@ -254,27 +263,107 @@ def empiricalEvaluationTransfer(
         where=input_signal != 0,
     )
 
-    if magn_pfase_show:
-        magnitude = np.abs(empirical_transfer_function)
-        phase = np.angle(empirical_transfer_function)
-
-        plt.figure(figsize=(12, 6))
-
-        plt.subplot(2, 1, 1)
-        plt.plot(omega, magnitude)
-        plt.title("Magnitude of Transfer Function")
-        plt.xlabel("Frequency (rad/sample)")
-        plt.ylabel("|G(e^jω)|")
-
-        plt.subplot(2, 1, 2)
-        plt.plot(omega, phase)
-        plt.title("Phase of Transfer Function")
-        plt.xlabel("Frequency (rad/sample)")
-        plt.ylabel("Phase (radians)")
-
-        plt.tight_layout()
-        plt.show()
-
+    if magnitude_phase_show:
+        # Plot the magnitude and phase of the transfer function
+        magnitude, phase = plot_transfer_function(empirical_transfer_function, omega)
         return empirical_transfer_function, magnitude, phase
 
     return empirical_transfer_function
+
+
+def computePsdBartlett(u, y, omega, gamma, show_plot=False):
+    """
+    Compute the Bartlett estimate of the power spectral density of a signal and a reference signal.
+
+    Parameters
+    ----------
+    u : array_like
+        The signal to which the power spectral density is computed.
+    y : array_like
+        The reference signal.
+    omega : array_like
+        The frequency values (radians per sample) corresponding to the power spectral density.
+    gamma : int
+        The length of the Bartlett window. It is used to compute the autocorrelation and cross-correlation matrices.
+    show_plot : bool, optional
+        Whether to plot the estimated power spectral density. If True, the function returns the estimated transfer function, its magnitude and phase. Otherwise, it returns only the estimated transfer function.
+
+    Returns
+    -------
+    ndarray or tuple
+        The estimated transfer function of the system. If show_plot is True, it returns a tuple containing the estimated transfer function, its magnitude and phase. Otherwise, it returns only the estimated transfer function.
+    """
+    tau = np.arange(-gamma, gamma + 1)  # Ngamma = gamme, so tau = -gamma:gamma
+    h = np.maximum(0, 1 - np.abs(tau) / gamma)  # if tau out of range, h = 0
+
+    # Compute the autocorrelation and cross-correlation matrices
+    R_u = calculateAutocorrelationMatrix(u, gamma + 1)
+    R_u_norm = np.concatenate((R_u[0], R_u[0][:-1][::-1]))
+
+    R_yu = calculateСrossСorrelationFunction(u, y, gamma + 1)
+    R_yu_norm = np.concatenate((R_yu, R_yu[:-1][::-1]))
+
+    # Compute the Fourier transform of the Bartlett windowed autocorrelation and cross-correlation matrices
+    F_u = np.zeros(len(omega), dtype=np.complex128)
+    for i in range(len(omega)):
+        F_u[i] = np.sum(h * R_u_norm * np.exp(-1j * omega[i] * tau), axis=0)
+
+    F_yu = np.zeros(len(omega), dtype=np.complex128)
+    for i in range(len(omega)):
+        F_yu[i] = np.sum(h * R_yu_norm * np.exp(-1j * omega[i] * tau), axis=0)
+
+    # Compute the estimated transfer function
+    Ghat = np.divide(F_yu, F_u)
+
+    # If show_plot is True, plot the estimated transfer function and return it, its magnitude and phase. Otherwise, return only the estimated transfer function.
+    if show_plot:
+        magnitude, phase = plot_transfer_function(Ghat, omega)
+        return Ghat, magnitude, phase
+
+    return Ghat
+
+
+def plot_transfer_function(transfer_vector, omega):
+    """
+    Plot the magnitude and phase of the estimated transfer function of a system.
+
+    Parameters
+    ----------
+    transfer_vector : ndarray
+        The estimated transfer function of the system.
+    omega : ndarray
+        The frequency values (radians per sample) corresponding to the estimated transfer function.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the magnitude and phase of the estimated transfer function.
+    """
+    magnitude = np.abs(transfer_vector)
+    phase = np.angle(transfer_vector)
+
+    # Create a figure with two subplots
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Plot the magnitude of the estimated transfer function
+    ax.subplot(2, 1, 1)
+    ax.plot(omega, magnitude)
+    ax.set_title("Magnitude of Estimated Transfer Function")
+    ax.set_xlabel("Frequency (rad/sample)")
+    ax.set_ylabel("|Ĝ(e^jω)|")
+
+    # Plot the phase of the estimated transfer function
+    ax.subplot(2, 1, 2)
+    ax.plot(omega, phase)
+    ax.set_title("Phase of Estimated Transfer Function")
+    ax.set_xlabel("Frequency (rad/sample)")
+    ax.set_ylabel("Phase (radians)")
+
+    # Adjust the layout of the subplots
+    fig.tight_layout()
+
+    # Show the plot
+    plt.show()
+
+    # Return the magnitude and phase of the estimated transfer function
+    return magnitude, phase

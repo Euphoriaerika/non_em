@@ -39,7 +39,7 @@ def calculateAutocorrelationMatrix(array, M):
     for i in range(M):
         for j in range(i, M):
             # Calculate the autocorrelation element R[i, j]
-            R[i, j] = (1 / N) * np.sum(array[j - i : N] * array[: N - (j - i)])
+            R[i, j] = (1 / N) * np.sum(array[j - i : N] * array[: N - (j - i)]).real
 
             # Ensure the matrix is symmetric
             if i != j:
@@ -78,7 +78,7 @@ def calculateСrossСorrelationFunction(out_array, in_array, M):
     R = np.zeros(M)
     for i in range(M):
         # Calculate the autocorrelation for lag i
-        R[i] = 1 / N * np.sum(out_array[i:N] * in_array[: N - i])
+        R[i] = 1 / N * np.sum(out_array[i:N] * in_array[: N - i]).real
     return R
 
 
