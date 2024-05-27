@@ -1,6 +1,6 @@
 import numpy as np
 
-caseConfig = 2
+caseConfig = 1
 
 if caseConfig == 1:
     # configuration constants

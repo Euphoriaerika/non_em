@@ -47,7 +47,8 @@ def calculateAutocorrelationMatrix(array, M):
 
     return R
 
-def calculateAutocorrelationFunction(array, M):
+
+def calculateСrossСorrelationFunction(out_array, in_array, M):
     """
     Calculate the autocorrelation function of a given array for lags from 0 to M-1.
 
@@ -73,11 +74,11 @@ def calculateAutocorrelationFunction(array, M):
 
     The calculation assumes the array length N is greater than or equal to M.
     """
-    N = len(array)
+    N = len(out_array)
     R = np.zeros(M)
     for i in range(M):
         # Calculate the autocorrelation for lag i
-        R[i] = 1 / N * np.sum(array[i:N] * array[: N - i])
+        R[i] = 1 / N * np.sum(out_array[i:N] * in_array[: N - i])
     return R
 
 
