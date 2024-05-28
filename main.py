@@ -84,7 +84,7 @@ def testNonEM():
 
     # magnitude_yw0, phase_shift_yw0 = nonem.frequencyResponse(y0, w0, show_cossin=True)
     # print(
-    #     f"Vector of the impulse response of the system:\nmagnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}"
+    #     f"magnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}"
     # )
 
     upk = nonem.fourierTransform(up, show_periodogram=False)
@@ -107,12 +107,12 @@ def testNonEM():
     # )
 
     # # Estimation of the frequency response for empirical evaluation of the transfer function for up and yp
-    # empirical_transfer_pk, magn_emp_pk, pfase_emp_pk = nonem.empiricalEvaluationTransfer(ypk, upk, magn_pfase_show=True)
+    # empirical_transfer_pk, magn_emp_pk, pfase_emp_pk = nonem.empiricalEvaluationTransfer(ypk, upk, plot_show=True)
     # print(empirical_transfer_pk, magn_emp_pk, pfase_emp_pk)
 
-    # Estimation of the frequency response for empirical evaluation of the transfer function for u and y
-    empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, omega=np.linspace(-np.pi, np.pi, N), magn_pfase_show=True)
-    print(empirical_transfer_k, magn_emp_k, pfase_emp_k)
+    # # Estimation of the frequency response for empirical evaluation of the transfer function for u and y
+    # empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, omega=np.linspace(-np.pi, np.pi, N), plot_show=True)
+    # print(empirical_transfer_k, magn_emp_k, pfase_emp_k)
     
     Ghat = nonem.computePsdBartlett(u1, y1, np.linspace(0, np.pi, N), N // 20, show_plot=True)
     print(Ghat)

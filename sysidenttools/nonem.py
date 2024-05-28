@@ -29,7 +29,6 @@ def cosineSineComponents(signal, w0):
     """
     N = len(signal)
     t = np.arange(1, N + 1)  # Time indices
-    print(t)
 
     Ic = np.sum(signal * np.cos(w0 * t)) / N
     Is = np.sum(signal * np.sin(w0 * t)) / N
@@ -191,7 +190,8 @@ def checkParsevalEquality(input_signal, fourier_signal):
 
     # Calculate the sum of squares of Fourier transform coefficients in frequency domain
     frequency_domain_sum = round(np.sum(np.abs(fourier_signal) ** 2), 3)
-
+    
+    print(f"standart={time_domain_sum}, transform={frequency_domain_sum}")
     # Check if the sums are equal
     return time_domain_sum == frequency_domain_sum
 
@@ -221,7 +221,7 @@ def searchZeroValue(fourier_signal):
 
 
 def empiricalEvaluationTransfer(
-    output_signal, input_signal, omega=None, magnitude_phase_show=False
+    output_signal, input_signal, omega=None, plot_show=False
 ):
     """
     Perform an empirical evaluation of the transfer function of a system.
@@ -263,9 +263,9 @@ def empiricalEvaluationTransfer(
         where=input_signal != 0,
     )
 
-    if magnitude_phase_show:
+    if plot_show:
         # Plot the magnitude and phase of the transfer function
-        magnitude, phase = plot_transfer_function(empirical_transfer_function, omega)
+        magnitude, phase = plotTransferFunction(empirical_transfer_function, omega)
         return empirical_transfer_function, magnitude, phase
 
     return empirical_transfer_function
@@ -317,13 +317,13 @@ def computePsdBartlett(u, y, omega, gamma, show_plot=False):
 
     # If show_plot is True, plot the estimated transfer function and return it, its magnitude and phase. Otherwise, return only the estimated transfer function.
     if show_plot:
-        magnitude, phase = plot_transfer_function(Ghat, omega)
+        magnitude, phase = plotTransferFunction(Ghat, omega)
         return Ghat, magnitude, phase
 
     return Ghat
 
 
-def plot_transfer_function(transfer_vector, omega):
+def plotTransferFunction(transfer_vector, omega):
     """
     Plot the magnitude and phase of the estimated transfer function of a system.
 
@@ -343,21 +343,21 @@ def plot_transfer_function(transfer_vector, omega):
     phase = np.angle(transfer_vector)
 
     # Create a figure with two subplots
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig = plt.figure(figsize=(12, 6))
 
     # Plot the magnitude of the estimated transfer function
-    ax.subplot(2, 1, 1)
-    ax.plot(omega, magnitude)
-    ax.set_title("Magnitude of Estimated Transfer Function")
-    ax.set_xlabel("Frequency (rad/sample)")
-    ax.set_ylabel("|Ĝ(e^jω)|")
+    ax1 = fig.add_subplot(2, 1, 1)
+    ax1.plot(omega, magnitude)
+    ax1.set_title("Magnitude of Estimated Transfer Function")
+    ax1.set_xlabel("Frequency (rad/sample)")
+    ax1.set_ylabel("|Ĝ(e^jω)|")
 
     # Plot the phase of the estimated transfer function
-    ax.subplot(2, 1, 2)
-    ax.plot(omega, phase)
-    ax.set_title("Phase of Estimated Transfer Function")
-    ax.set_xlabel("Frequency (rad/sample)")
-    ax.set_ylabel("Phase (radians)")
+    ax2 = fig.add_subplot(2, 1, 2)
+    ax2.plot(omega, phase)
+    ax2.set_title("Phase of Estimated Transfer Function")
+    ax2.set_xlabel("Frequency (rad/sample)")
+    ax2.set_ylabel("Phase (radians)")
 
     # Adjust the layout of the subplots
     fig.tight_layout()
