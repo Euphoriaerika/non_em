@@ -57,9 +57,9 @@ def calculateСrossСorrelationFunction(out_array, in_array, M):
     """
     N = len(out_array)
     R = np.zeros(M)
-    for i in range(M):
+    for i in range(1, M + 1):
         # Calculate the autocorrelation for lag i
-        R[i] = 1 / N * np.sum(out_array[i:N] * in_array[: N - i]).real
+        R[i - 1] = 1 / N * np.sum(out_array[i:N] * in_array[: N - i]).real
     return R
 
 

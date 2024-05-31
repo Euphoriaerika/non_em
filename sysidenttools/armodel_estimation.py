@@ -16,7 +16,6 @@ def estimateParametersVector(y, N, n):
     an -- vector of estimated parameters
 
     """
-    Nk = N - 1
     # calculation of regression matrix elements (4)
     rec_matrix = calculateAutocorrelationMatrix(y, N)
 
@@ -72,7 +71,7 @@ def evaluateOutputData(input_data, params, N, n):
         # Calculate fT
         for j in range(n):
             if i > j:
-                fT[j] = input_data[i - j - 1]  # if i > j, calculate fT from the y array
+                fT[j] = - input_data[i - j - 1]  # if i > j, calculate fT from the y array
             else:
                 fT[j] = 0  # if out of bounds, fT = 0
 
