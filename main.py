@@ -13,8 +13,8 @@ def testARModelEstimation():
         # Estimate the parameters vector
         O = ar.estimateParametersVector(y, N, n_iter)
         print(f"Estimated parameters vector: {O}")
+
         # Evaluate the output data
-        # CHECK
         yk = ar.evaluateOutputData(y, O, N, n_iter)
         # print(f"Evaluation of the output data: \n{yk}")
 
@@ -56,7 +56,9 @@ def testARModelEstimation():
         print(f"Number: {n_iter} with dispersion: {math_dispersion}\n")
 
     # Print the optimal model order and minimum dispersion
-    print(f"Optimal model order: {min_n} with min dispersion: {min_dis}")
+    print(
+        f"Optimal model order: {min_n} with dispersion: {min_dis} and math expectation: {min_me}"
+    )
 
     # Write y_res to output_data/BRRudenko.txt
     with open("output_data/BRRudenko.txt", "w") as file:
@@ -76,25 +78,23 @@ def testARModelEstimation():
 
 
 def testNonEM():
-    # uk = nonem.fourierTransform(u1, show_periodogram=False)
+    uk = nonem.fourierTransform(u1, show_periodogram=False)
     # print(f"Fourier transform of a signal uk:\n{uk}")
 
-    # yk = nonem.fourierTransform(y1, show_periodogram=False)
+    yk = nonem.fourierTransform(y1, show_periodogram=False)
     # print(f"Fourier transform of a signal yk:\n{yk}")
 
-    assessment = nonem.assessmentImpulseResponse(y1, u1, M)
-    print(f"Vector of the impulse response of the system:\n{assessment}")
+    # assessment = nonem.assessmentImpulseResponse(y1, u1, M)
+    # print(f"Vector of the impulse response of the system:\n{assessment}")
 
-    magnitude_yw0, phase_shift_yw0 = nonem.frequencyResponse(y0, w0, show_cossin=True)
-    print(
-        f"magnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}"
-    )
+    # magnitude_yw0, phase_shift_yw0 = nonem.frequencyResponse(y0, w0, show_cossin=True)
+    # print(f"magnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}")
 
-    # upk = nonem.fourierTransform(up, show_periodogram=False)
+    upk = nonem.fourierTransform(up, show_periodogram=False)
     # print(f"Fourier transform of a signal up:\n{upk}")
     # print(nonem.searchZeroValue(upk))
 
-    # ypk = nonem.fourierTransform(yp, show_periodogram=False)
+    ypk = nonem.fourierTransform(yp, show_periodogram=False)
     # print(f"Fourier transform of a signal yk:\n{ypk}")
     # print(nonem.searchZeroValue(ypk))
 
@@ -113,19 +113,18 @@ def testNonEM():
     # empirical_transfer_pk, magn_emp_pk, pfase_emp_pk = nonem.empiricalEvaluationTransfer(ypk, upk, plot_show=True)
     # print(empirical_transfer_pk, magn_emp_pk, pfase_emp_pk)
 
-    # # Estimation of the frequency response for empirical evaluation of the transfer function for u and y
-    # empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, omega=np.linspace(-np.pi, np.pi, N), plot_show=True)
+    # Estimation of the frequency response for empirical evaluation of the transfer function for u and y
+    # empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, plot_show=True)
     # print(empirical_transfer_k, magn_emp_k, pfase_emp_k)
 
-    # Ghat = nonem.computePsdBartlett(
-    #     u1, y1, np.linspace(0, np.pi, N), N // 20, show_plot=True
-    # )
-    # print(Ghat)
+    Ghat = nonem.computePsdBartlett(
+        u1, y1, np.linspace(0, np.pi, N), N // 20, show_plot=True
+    )
 
 
 def main():
-    # testNonEM()
-    testARModelEstimation()
+    testNonEM()
+    # testARModelEstimation()
 
 
 if __name__ == "__main__":

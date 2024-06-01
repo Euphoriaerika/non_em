@@ -97,12 +97,10 @@ def assessmentImpulseResponse(output_signal, input_signal, M):
     """
     # Calculate autocorrelation matrices
     RNMuVar = calculateAutocorrelationMatrix(input_signal, M)
-    RNMyVar = calculateСrossСorrelationFunction(input_signal, output_signal, M)
+    RNMyVar = calculateСrossСorrelationFunction(output_signal, input_signal, M)
 
     # Estimate impulse response vector
-    impulse_response = np.matmul(np.linalg.inv(RNMuVar), RNMyVar.T)
-
-    return impulse_response
+    return np.matmul(np.linalg.inv(RNMuVar), RNMyVar.T)
 
 
 # ===============================================
@@ -190,7 +188,7 @@ def checkParsevalEquality(input_signal, fourier_signal):
 
     # Calculate the sum of squares of Fourier transform coefficients in frequency domain
     frequency_domain_sum = round(np.sum(np.abs(fourier_signal) ** 2), 3)
-    
+
     print(f"standart={time_domain_sum}, transform={frequency_domain_sum}")
     # Check if the sums are equal
     return time_domain_sum == frequency_domain_sum
@@ -221,7 +219,7 @@ def searchZeroValue(fourier_signal):
 
 
 def empiricalEvaluationTransfer(
-    output_signal, input_signal, omega=None, plot_show=False
+    output_signal, input_signal, plot_show=False
 ):
     """
     Perform an empirical evaluation of the transfer function of a system.
@@ -244,13 +242,6 @@ def empiricalEvaluationTransfer(
         A tuple containing the empirical transfer function, its magnitude and phase if
         magnitude_phase_show is True, otherwise returns only the empirical transfer function.
     """
-    if omega is None:
-        # Generate frequencies from 1 to the sample rate of the output signal
-        omega = [
-            (2 * np.pi * i) / output_signal.size
-            for i in range(1, output_signal.size + 1)
-        ]
-    print(omega)
     # Check if input signals have the same size
     if len(output_signal) != len(input_signal):
         raise ValueError("Output signal and input signal must have the same size.")
@@ -265,7 +256,7 @@ def empiricalEvaluationTransfer(
 
     if plot_show:
         # Plot the magnitude and phase of the transfer function
-        magnitude, phase = plotTransferFunction(empirical_transfer_function, omega)
+        magnitude, phase = plotTransferFunction(empirical_transfer_function)
         return empirical_transfer_function, magnitude, phase
 
     return empirical_transfer_function
@@ -317,13 +308,13 @@ def computePsdBartlett(u, y, omega, gamma, show_plot=False):
 
     # If show_plot is True, plot the estimated transfer function and return it, its magnitude and phase. Otherwise, return only the estimated transfer function.
     if show_plot:
-        magnitude, phase = plotTransferFunction(Ghat, omega)
+        magnitude, phase = plotTransferFunction(Ghat)
         return Ghat, magnitude, phase
 
     return Ghat
 
 
-def plotTransferFunction(transfer_vector, omega):
+def plotTransferFunction(transfer_vector):
     """
     Plot the magnitude and phase of the estimated transfer function of a system.
 
@@ -340,21 +331,27 @@ def plotTransferFunction(transfer_vector, omega):
         A tuple containing the magnitude and phase of the estimated transfer function.
     """
     magnitude = np.abs(transfer_vector)
+    magnitude = np.fft.fftshift(magnitude) 
+
     phase = np.angle(transfer_vector)
+    phase = np.fft.fftshift(phase) 
+
+    freqs = np.fft.fftfreq(transfer_vector.size) * 2 * np.pi  # Scale frequencies to [-pi, pi]
+    freqs = np.fft.fftshift(freqs)
 
     # Create a figure with two subplots
     fig = plt.figure(figsize=(12, 6))
 
     # Plot the magnitude of the estimated transfer function
     ax1 = fig.add_subplot(2, 1, 1)
-    ax1.plot(omega, magnitude)
+    ax1.plot(freqs, magnitude)
     ax1.set_title("Magnitude of Estimated Transfer Function")
     ax1.set_xlabel("Frequency (rad/sample)")
     ax1.set_ylabel("|Ĝ(e^jω)|")
 
     # Plot the phase of the estimated transfer function
     ax2 = fig.add_subplot(2, 1, 2)
-    ax2.plot(omega, phase)
+    ax2.plot(freqs, phase)
     ax2.set_title("Phase of Estimated Transfer Function")
     ax2.set_xlabel("Frequency (rad/sample)")
     ax2.set_ylabel("Phase (radians)")

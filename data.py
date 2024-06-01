@@ -1,12 +1,13 @@
 import numpy as np
 
-caseConfig = 2
+caseConfig = 1
 
 if caseConfig == 1:
     # configuration constants
     N = 100
     M = 30
-    w0 = 7 * 2**0.5 / 12  # frequency of the cosine signal
+    #w0 = 7 * 2**0.5 / 12  # frequency of the cosine signal
+    w0 = 2 ** 0.5
     y = N / 20  # window width parameter
 
     # load data from input_data folder
