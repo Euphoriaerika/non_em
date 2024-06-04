@@ -297,24 +297,25 @@ def computePsdBartlett(u, y, omega, gamma, show_plot=False):
     # Compute the Fourier transform of the Bartlett windowed autocorrelation and cross-correlation matrices
     F_u = np.zeros(len(omega), dtype=np.complex128)
     for i in range(len(omega)):
-        F_u[i] = np.sum(h * R_u_norm * np.exp(-1j * omega[i] * tau), axis=0)
+        F_u[i] = np.sum(h * R_u_norm * np.exp(-1j * omega[i] * tau))
+        if i == 0: print(F_u[i])
 
     F_yu = np.zeros(len(omega), dtype=np.complex128)
     for i in range(len(omega)):
-        F_yu[i] = np.sum(h * R_yu_norm * np.exp(-1j * omega[i] * tau), axis=0)
+        F_yu[i] = np.sum(h * R_yu_norm * np.exp(-1j * omega[i] * tau))
 
     # Compute the estimated transfer function
     Ghat = np.divide(F_yu, F_u)
 
     # If show_plot is True, plot the estimated transfer function and return it, its magnitude and phase. Otherwise, return only the estimated transfer function.
     if show_plot:
-        magnitude, phase = plotTransferFunction(Ghat)
+        magnitude, phase = plotTransferFunction(Ghat, s=np.pi, sh=np.pi / 2, orientation="horizontal")
         return Ghat, magnitude, phase
 
     return Ghat
 
 
-def plotTransferFunction(transfer_vector):
+def plotTransferFunction(transfer_vector, s=2 * np.pi, sh=0, orientation="vertical"):
     """
     Plot the magnitude and phase of the estimated transfer function of a system.
 
@@ -336,21 +337,27 @@ def plotTransferFunction(transfer_vector):
     phase = np.angle(transfer_vector)
     phase = np.fft.fftshift(phase) 
 
-    freqs = np.fft.fftfreq(transfer_vector.size) * 2 * np.pi  # Scale frequencies to [-pi, pi]
+    freqs = np.fft.fftfreq(transfer_vector.size) * s + sh  # Scale frequencies to [-pi, pi]
     freqs = np.fft.fftshift(freqs)
 
     # Create a figure with two subplots
     fig = plt.figure(figsize=(12, 6))
 
     # Plot the magnitude of the estimated transfer function
-    ax1 = fig.add_subplot(2, 1, 1)
+    if orientation == "horizontal":
+        ax1 = fig.add_subplot(1, 2, 1)
+    else:
+        ax1 = fig.add_subplot(2, 1, 1)    
     ax1.plot(freqs, magnitude)
     ax1.set_title("Magnitude of Estimated Transfer Function")
     ax1.set_xlabel("Frequency (rad/sample)")
     ax1.set_ylabel("|Ĝ(e^jω)|")
 
     # Plot the phase of the estimated transfer function
-    ax2 = fig.add_subplot(2, 1, 2)
+    if orientation == "horizontal":
+        ax2 = fig.add_subplot(1, 2, 2)
+    else:
+        ax2 = fig.add_subplot(2, 1, 2)
     ax2.plot(freqs, phase)
     ax2.set_title("Phase of Estimated Transfer Function")
     ax2.set_xlabel("Frequency (rad/sample)")

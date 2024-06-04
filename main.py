@@ -79,10 +79,10 @@ def testARModelEstimation():
 
 def testNonEM():
     uk = nonem.fourierTransform(u1, show_periodogram=False)
-    # print(f"Fourier transform of a signal uk:\n{uk}")
+    print(f"Fourier transform of a signal uk:\n{uk}")
 
     yk = nonem.fourierTransform(y1, show_periodogram=False)
-    # print(f"Fourier transform of a signal yk:\n{yk}")
+    print(f"Fourier transform of a signal yk:\n{yk}")
 
     # assessment = nonem.assessmentImpulseResponse(y1, u1, M)
     # print(f"Vector of the impulse response of the system:\n{assessment}")
@@ -90,11 +90,11 @@ def testNonEM():
     # magnitude_yw0, phase_shift_yw0 = nonem.frequencyResponse(y0, w0, show_cossin=True)
     # print(f"magnitude = {magnitude_yw0}\nphase shift = {phase_shift_yw0}")
 
-    upk = nonem.fourierTransform(up, show_periodogram=False)
+    # upk = nonem.fourierTransform(up, show_periodogram=False)
     # print(f"Fourier transform of a signal up:\n{upk}")
     # print(nonem.searchZeroValue(upk))
 
-    ypk = nonem.fourierTransform(yp, show_periodogram=False)
+    # ypk = nonem.fourierTransform(yp, show_periodogram=False)
     # print(f"Fourier transform of a signal yk:\n{ypk}")
     # print(nonem.searchZeroValue(ypk))
 
@@ -114,12 +114,12 @@ def testNonEM():
     # print(empirical_transfer_pk, magn_emp_pk, pfase_emp_pk)
 
     # Estimation of the frequency response for empirical evaluation of the transfer function for u and y
-    # empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, plot_show=True)
-    # print(empirical_transfer_k, magn_emp_k, pfase_emp_k)
+    empirical_transfer_k, magn_emp_k, pfase_emp_k = nonem.empiricalEvaluationTransfer(yk, uk, plot_show=True)
+    print(empirical_transfer_k, magn_emp_k, pfase_emp_k)
 
-    Ghat = nonem.computePsdBartlett(
-        u1, y1, np.linspace(0, np.pi, N), N // 20, show_plot=True
-    )
+    # Ghat = nonem.computePsdBartlett(
+    #     u1, y1, np.linspace(0, np.pi, N), N // 20, show_plot=True
+    # )
 
 
 def main():
